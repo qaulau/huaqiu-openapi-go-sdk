@@ -38,7 +38,6 @@ func GenSign(secret string, params Params) string{
 	}
 	buf.WriteString(secret)
 	data := buf.String()
-	fmt.Println(data)
 	return Md5digest(data)
 }
 
