@@ -1,33 +1,41 @@
 package openapi
 
 import (
-	"encoding/json"
-	"io/ioutil"
+	jsoniter "github.com/json-iterator/go"
 	"net/http"
 )
 
 type Result struct {
-	code 			int64 `json:"response_code"`
-	info            string `json:"response_info"`
-	msg             string `json:"response_message"`
-	data            map[string]interface{} `json:"response_data"`
+	Code   int64 `json:"response_code"`
+	Info   string `json:"response_info"`
+	Msg    string `json:"error_message"`
+	Data   jsoniter.Any
 }
 
 type Response struct {
 	http.Response
-	Content         string
-	Data            Result
+	client          *Client
+	Text         	string
+	Content 		[]byte
+	json            Result
 }
 
 func (this *Response) parse(){
 	result := Result{}
-	body, _ := ioutil.ReadAll(this.Body)
-	error := json.Unmarshal(body, result)
+	error := jsoniter.Unmarshal(this.Content, &result)
 	if error != nil {
-		result.code = 3001
-		result.msg  = error.Error()
-		result.info = "SYSTEM_ERROR"
+		result.Code = 3001
+		result.Msg  = error.Error()
+		result.Info = "SYSTEM_ERROR"
+	}else{
+		result.Data = jsoniter.Get(this.Content, this.client.dataName)
 	}
-	this.Data = result
-	this.Content = string(body)
+	this.json = result
+}
+
+func (this *Response) Result() (Result) {
+	if this.json.Code == 0 {
+		this.parse()
+	}
+	return this.json
 }

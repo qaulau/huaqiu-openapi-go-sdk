@@ -5,7 +5,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"io"
-	"net/url"
 	"sort"
 	"time"
 )
@@ -39,6 +38,7 @@ func GenSign(secret string, params Params) string{
 	}
 	buf.WriteString(secret)
 	data := buf.String()
+	fmt.Println(data)
 	return Md5digest(data)
 }
 
@@ -54,4 +54,19 @@ func UnixTimeByLocation(location string) int64 {
 		return 0
 	}
 	return time.Now().In(loc).Unix()
+}
+
+// 转换字符串
+func String(v interface{}) string{
+	switch v.(type) {
+	case string:
+		s := v.(string)
+		return s
+	case int,int32,int64:
+		s := fmt.Sprintf("%d", v)
+		return s
+	default:
+		s := fmt.Sprintf("%s", v)
+		return s
+	}
 }
