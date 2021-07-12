@@ -9,6 +9,15 @@ import (
 
 type Params map[string]any
 
+// 获取转换参数类型
+func NewParams(dict map[string]interface{}) *Params {
+	params := &Params{}
+	for k, v := range dict{
+		params.Add(k, v)
+	}
+	return params
+}
+
 // 合并新的参数
 func (p *Params) Merge(params url.Values) (Params)  {
 	c := Params{}
