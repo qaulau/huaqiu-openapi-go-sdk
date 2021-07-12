@@ -20,7 +20,7 @@ import (
 
 func main(){
 	client := hqchip.New("Your HQCHIP AppKey", "Your HQCHIP AppSecret")
-	params := openapi.Params{}
+	params := &openapi.Params{}
 	params.Add("order_id", 257194)
 	resp, err := client.Get("/order/detail/", params)
 	if err != nil {
@@ -46,7 +46,7 @@ import (
 
 func main(){
 	client := hqpcb.New("Your HQPCB AppID", "Your HQPCB AppSecret")
-	params := openapi.Params{}
+	params := &openapi.Params{}
 	params.Add("order_id", 1574974)
 	resp, err := client.Get("/order/", params)
 	if err != nil {

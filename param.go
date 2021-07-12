@@ -10,47 +10,47 @@ import (
 type Params map[string]any
 
 // 获取转换参数类型
-func NewParams(dict map[string]interface{}) *Params {
+func NewParams(dict *map[string]interface{}) *Params {
 	params := &Params{}
-	for k, v := range dict{
+	for k, v := range *dict{
 		params.Add(k, v)
 	}
 	return params
 }
 
 // 合并新的参数
-func (p *Params) Merge(params url.Values) (Params)  {
+func (p *Params) Merge(params *url.Values) (*Params)  {
 	c := Params{}
 	for k, v := range *p{
 		c[k] = v
 	}
 	if params == nil{
-		return c
+		return &c
 	}
-	for k, v := range params{
+	for k, v := range *params{
 		c[k] = NewAny(v[0])
 	}
-	return c
+	return &c
 }
 
 // 更新原有的数据
-func (p *Params) Update (params Params) (Params) {
+func (p *Params) Update (params *Params) (Params) {
 	if params == nil {
 		return *p
 	}
-	for k, v := range params{
+	for k, v := range *params{
 		(*p)[k] = v
 	}
 	return *p
 }
 
 // 转换为标准库 url 数值类型
-func (p *Params) UrlValues() (url.Values) {
+func (p *Params) UrlValues() (*url.Values) {
 	var u = url.Values{}
 	for k, v := range *p {
 		u.Add(k, v.String())
 	}
-	return u
+	return &u
 }
 
 // 转换为请求body 数值类型

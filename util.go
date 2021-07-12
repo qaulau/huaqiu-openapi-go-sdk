@@ -17,11 +17,11 @@ func Md5digest(data string) string{
 }
 
 // 生成签名
-func GenSign(secret string, params Params) string{
+func GenSign(secret string, params *Params) string{
 	var keys []string
 	buf := bytes.Buffer{}
 	buf.WriteString(secret)
-	for k, _ := range params {
+	for k, _ := range *params {
 		if k != "sign" && k != "signature" {
 			keys = append(keys, k)
 		}

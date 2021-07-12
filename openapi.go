@@ -103,13 +103,13 @@ func New(appid string, secret string, opts ... OptionFunc) (client *Client){
 }
 
 // 获取URL请求参数
-func (this *Client) URLValues(query url.Values, params Params) (url.Values) {
-	var p = url.Values{}
+func (this *Client) URLValues(query *url.Values, params *Params) (*url.Values) {
+	var p = &url.Values{}
 	p.Add(this.appidName, this.appId)
 	fmt.Println(UnixTime())
 	p.Add("timestamp", fmt.Sprintf("%d", UnixTime()))
 	if query != nil {
-		for k, v := range query{
+		for k, v := range *query{
 			p.Add(k, v[0])
 		}
 	}
@@ -120,10 +120,10 @@ func (this *Client) URLValues(query url.Values, params Params) (url.Values) {
 }
 
 // 接口请求操作
-func (this *Client) DoRequest(method string, api string, query url.Values, data Params, files Params) (*Response, error) {
+func (this *Client) DoRequest(method string, api string, query *url.Values, data *Params, files *Params) (*Response, error) {
 	var body io.ReadCloser
 	if data == nil {
-		data = Params{}
+		data = &Params{}
 	}
 	values := this.URLValues(query, data)
 	header := make(http.Header)
@@ -136,11 +136,11 @@ func (this *Client) DoRequest(method string, api string, query url.Values, data 
 		body := &bytes.Buffer{}
 		writer := multipart.NewWriter(body)
 		if data != nil {
-			for k, v := range data{
+			for k, v := range *data{
 				writer.WriteField(k, v.String())
 			}
 		}
-		for k, v := range files{
+		for k, v := range *files{
 			fn := v.String()
 			st, err := os.Stat(fn)
 			if err != nil {
@@ -226,27 +226,27 @@ func (this *Client) Header(key, value string) *Client {
 }
 
 // 接口 GET 请求
-func (this *Client) Get(api string, params Params) (*Response, error) {
+func (this *Client) Get(api string, params *Params) (*Response, error) {
 	return this.DoRequest(http.MethodGet, api, params.UrlValues(), nil, nil)
 }
 
 // 接口 POST 请求
-func (this *Client) Post(api string, params Params)  (*Response, error) {
+func (this *Client) Post(api string, params *Params)  (*Response, error) {
 	return this.DoRequest(http.MethodPost, api, nil, params, nil)
 }
 
 // 接口 PUT 请求
-func (this *Client) Put(api string, params Params)  (*Response, error) {
+func (this *Client) Put(api string, params *Params)  (*Response, error) {
 	return this.DoRequest(http.MethodPut, api, nil, params, nil)
 }
 
 // 接口 DELETE 请求
-func (this *Client) Delete(api string, params Params)  (*Response, error) {
+func (this *Client) Delete(api string, params *Params)  (*Response, error) {
 	return this.DoRequest(http.MethodDelete, api, params.UrlValues(), nil, nil)
 }
 
 // 接口 上传文件请求
-func (this *Client) PostFile(api string, files Params, params Params) (*Response, error){
+func (this *Client) PostFile(api string, files *Params, params *Params) (*Response, error){
 	if files == nil {
 		return nil, errors.New("files is empty")
 	}
