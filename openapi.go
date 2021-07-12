@@ -121,7 +121,7 @@ func (this *Client) URLValues(query *url.Values, params *Params) (*url.Values) {
 
 // 接口请求操作
 func (this *Client) DoRequest(method string, api string, query *url.Values, data *Params, files *Params) (*Response, error) {
-	var body io.ReadCloser
+	var body io.Reader
 	if data == nil {
 		data = &Params{}
 	}
@@ -161,7 +161,8 @@ func (this *Client) DoRequest(method string, api string, query *url.Values, data
 		if data == nil || data.Size() == 0 {
 			body = nil
 		}else{
-			body = data.Body()
+			body = data.Buffer()
+			header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 		}
 	}
 	if header.Get("User-Agent") == "" {
@@ -188,7 +189,22 @@ func (this *Client) DoRequest(method string, api string, query *url.Values, data
 		Host:       this.apiDomain,
 	}
 	if body != nil {
-		request.Body = body
+		rc, ok := body.(io.ReadCloser)
+		if !ok && body != nil {
+			rc = ioutil.NopCloser(body)
+		}
+		request.Body = rc
+		switch v := body.(type) {
+		case *bytes.Buffer:
+			request.ContentLength = int64(v.Len())
+			buf := v.Bytes()
+			request.GetBody = func() (io.ReadCloser, error) {
+				r := bytes.NewReader(buf)
+				return ioutil.NopCloser(r), nil
+			}
+		default:
+
+		}
 	}
 
 	request.Header = header

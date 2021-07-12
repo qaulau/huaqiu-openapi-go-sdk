@@ -2,8 +2,6 @@ package openapi
 
 import (
 	"bytes"
-	"io"
-	"io/ioutil"
 	"net/url"
 )
 
@@ -54,10 +52,12 @@ func (p *Params) UrlValues() (*url.Values) {
 }
 
 // 转换为请求body 数值类型
-func (p *Params) Body () (io.ReadCloser) {
+func (p *Params) Buffer () (*bytes.Buffer) {
 	v := p.UrlValues()
 	b := []byte(v.Encode())
-	return ioutil.NopCloser(bytes.NewReader(b))
+	buf := &bytes.Buffer{}
+	buf.Write(b)
+	return buf
 }
 
 // 获取指定键值
